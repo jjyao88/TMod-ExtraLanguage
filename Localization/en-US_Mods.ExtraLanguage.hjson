@@ -1,0 +1,32 @@
+Configs: {
+	LocalizationConfig: {
+		DisplayName: Localization Settings
+
+		LanguageName: {
+			Label: Current Language Code
+			Tooltip: ""
+		}
+
+		UseFanhuaji: {
+			Label: Use Fanhuaji
+			Tooltip: Convert Simplified Chinese strings to Traditional Chinese using the Fanhuaji online service.
+		}
+
+		FanhuajiUserPostItems: {
+			Label: Additional Replacements after Fanhuaji Conversion
+			Tooltip:
+				'''
+				Additional replacements to be applied after conversion, need to be reloaded to rebuild the translation file to take effect!
+				Format: Original String=Revised String
+				'''
+		}
+
+		TChineseHeader: Additional Settings for Traditional Chinese
+		DeveloperOnlyHeader: For Developers Only
+
+		LoadedLocalizationKeys: {
+			Label: Total Loaded Localization Strings
+			Tooltip: Number of converted strings loaded into the game
+		}
+	}
+}

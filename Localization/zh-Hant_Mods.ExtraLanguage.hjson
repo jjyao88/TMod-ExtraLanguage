@@ -1,0 +1,32 @@
+Configs: {
+	LocalizationConfig: {
+		DisplayName: 在地化設定
+
+		LanguageName: {
+			Label: 當前語言代碼
+			Tooltip: ""
+		}
+
+		UseFanhuaji: {
+			Label: 使用繁化姬
+			Tooltip: 透過繁化姬線上服務，將簡體中文字串轉換成正體中文。
+		}
+
+		FanhuajiUserPostItems: {
+			Label: 繁化姬轉換後取代
+			Tooltip:
+				'''
+				轉換後再進行的額外取代，需重新載入來重建翻譯文件才會生效！
+				格式為：修正前字串=修正後字串
+				'''
+		}
+
+		TChineseHeader: 正體中文額外設定
+		DeveloperOnlyHeader: 僅供開發人員使用
+
+		LoadedLocalizationKeys: {
+			Label: 已讀取模組在地化字串數量
+			Tooltip: 有多少轉換後字串被讀取到遊戲中
+		}
+	}
+}
