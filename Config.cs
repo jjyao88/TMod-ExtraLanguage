@@ -46,7 +46,7 @@ namespace ExtraLanguage
 
 		#region Fanhuaji
 		[Header("$Mods.ExtraLanguage.Configs.LocalizationConfig.TChineseHeader")]
-		[DefaultValue(false)]
+		[DefaultValue(true)]
 		[ReloadRequired]
 		public bool UseFanhuaji;
 

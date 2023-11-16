@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Terraria.Localization;
 
 namespace ExtraLanguage
@@ -46,6 +43,31 @@ namespace ExtraLanguage
 						yield return f;
 					}
 				}
+			}
+		}
+
+		public static string GetTempDirectory() {
+			string tempDir;
+
+			while (true) {
+				tempDir = Path.Combine(ExtraLanguage.TempDir, Path.GetRandomFileName());
+				if (!Directory.Exists(tempDir)) {
+					Directory.CreateDirectory(tempDir);
+					return tempDir;
+				}
+			}
+		}
+
+		public static void DeleteSubdirectories(string baseDir)
+		{
+			if (!Directory.Exists(baseDir))
+			{
+				return;
+			}
+
+			foreach (var subDir in Directory.GetDirectories(baseDir))
+			{
+				Directory.Delete(subDir, recursive: true);
 			}
 		}
 

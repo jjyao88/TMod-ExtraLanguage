@@ -13,8 +13,10 @@ namespace ExtraLanguage
 {
 	public partial class ExtraLanguage : Mod
 	{
-		internal static string MainDir = Path.Combine(Main.SavePath, nameof(ExtraLanguage));
-		internal static string LocalizationDir = Path.Combine(MainDir, "Localization");
+		public static readonly string MainDir = Path.Combine(Main.SavePath, nameof(ExtraLanguage));
+		public static readonly string LocalizationDir = Path.Combine(MainDir, "Localization");
+		public static readonly string TempDir = Path.Combine(ExtraLanguage.MainDir, "tmp");
+
 		internal static Dictionary<string, List<(string, string)>> ModdedKeys;
 		private static PluginManager PluginManager;
 		private readonly static string[] IncompatibleModNames = new string[] {
@@ -32,6 +34,10 @@ namespace ExtraLanguage
 				}
 			}
 
+			Directory.CreateDirectory(MainDir);
+			Directory.CreateDirectory(LocalizationDir);
+			Directory.CreateDirectory(TempDir);
+
 			ModdedKeys = new Dictionary<string, List<(string, string)>>();
 			PluginManager = new PluginManager();
 
@@ -39,9 +45,6 @@ namespace ExtraLanguage
 			{
 				ModdedKeys.Add(lang.CultureName, new List<(string, string)>());
 			}
-
-			Directory.CreateDirectory(MainDir);
-			Directory.CreateDirectory(LocalizationDir);		
 
 			var namedCulturesFieldInfo = typeof(GameCulture).GetField("_NamedCultures", BindingFlags.Static | BindingFlags.NonPublic);
 			var namedCultures = (Dictionary<GameCulture.CultureName, GameCulture>)namedCulturesFieldInfo.GetValue(null);
@@ -87,6 +90,7 @@ namespace ExtraLanguage
 
 			PluginManager = null;
 			ModdedKeys = null;
+			Directory.Delete(TempDir, recursive: true);
 		}
 
 		public override void PostSetupContent()
@@ -103,12 +107,9 @@ namespace ExtraLanguage
 				LanguageManager.Instance.SetLanguage(cfg.LanguageName);
 			}
 
-			List<BasePlugin> plugins = new();
-
-			if (cfg.UseFanhuaji && Language.ActiveCulture.Name == "zh-Hant")
-			{
-				plugins.Add(new S2TChineseConvert(forceRecreateLocalization: true));
-			}
+			List<BasePlugin> plugins = new() {
+				new S2TChineseConvert(forceRecreateLocalization: false)
+			};
 
 			foreach (var plugin in plugins)
 			{

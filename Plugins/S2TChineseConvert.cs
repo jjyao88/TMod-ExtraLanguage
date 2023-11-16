@@ -8,18 +8,19 @@ using Newtonsoft.Json.Linq;
 using Hjson;
 using System.Collections.Generic;
 using Terraria.ModLoader;
+using System.Linq;
+using Terraria;
 
 namespace ExtraLanguage.Plugins
 {
     public class S2TChineseConvert : BasePlugin
     {
         public new string[] SupportedLanguages => new string[] { "zh-Hant" };
-        private LangExtractor langExtractor = new("zh-Hans");
         private readonly ITranslator Translator;
         private static readonly Regex cjkCharRegex = new(@"\p{IsCJKUnifiedIdeographs}");
         private bool ForceRecreateLocalization;
 
-        internal readonly string zhHansDir;
+		internal readonly string zhHansDir;
 		internal readonly string zhHantDir;
 
 		public override bool WaitForLoad => true;
@@ -34,42 +35,137 @@ namespace ExtraLanguage.Plugins
             ForceRecreateLocalization = forceRecreateLocalization;
         }
 
-        public static bool IsContainCJK(string text)
+		protected override bool CheckCondition()
+		{
+			if (!cfg.UseFanhuaji)
+				return false;
+
+			return base.CheckCondition();
+		}
+
+		public static bool IsContainCJK(string text)
         {
 			return cjkCharRegex.IsMatch(text);
 		}
 
+		public static bool IsModContainCJK(string modName) {
+
+            ModLoader.TryGetMod(modName, out Mod result);
+            if (result == null) {
+				return false;
+			}
+
+			var tempDir = Utility.GetTempDirectory();
+			LangExtractor.ExtractLocalization(modName, "zh-Hans", tempDir);
+			foreach (var fileInfo in Utility.GetFullDirList(new DirectoryInfo(tempDir), "*.hjson", 5))
+			{
+				var cnHjson = File.ReadAllText(fileInfo.FullName);
+
+				if (IsContainCJK(cnHjson))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private static Dictionary<string, Version> GenerateModVeriosnList() {
+			var dict = new Dictionary<string, Version>();
+			foreach (Mod mod in ModLoader.Mods)
+			{
+				dict.Add(mod.Name, mod.Version);
+			}
+			return dict;
+		}
+
         internal override async Task Load()
         {
-			if (ForceRecreateLocalization)
-			{
-				langExtractor.ExtractLocalization();
+			string modJsonPath = Path.Combine(zhHantDir, "mods.json");
+			bool createFlag = ForceRecreateLocalization || !File.Exists(modJsonPath);
 
-				foreach (var fileInfo in Utility.GetFullDirList(new DirectoryInfo(zhHansDir), "*.hjson", 5))
-				{
-					int startIdx = Path.GetFullPath(zhHansDir).Split(Path.DirectorySeparatorChar).Length - 1;
-					var cnHjson = File.ReadAllText(fileInfo.FullName);
-
-					if (!IsContainCJK(cnHjson))
-					{
-						continue;
-					}
-
-					var translatedText = await TranslateStrings(cnHjson, "zh-Hans", "zh-Hant");
-					var splitPath = fileInfo.FullName.Split(Path.DirectorySeparatorChar);
-
-					for (int i = startIdx; i < splitPath.Length; i++)
-					{
-						splitPath[i] = splitPath[i].Replace("zh-Hans", "zh-Hant");
-					}
-
-					var dstFilePath = Path.Combine(splitPath);
-					Utility.CreateTextFile(dstFilePath, translatedText);
+			if (createFlag) {
+				if (Directory.Exists(zhHantDir)) {
+					Directory.Delete(zhHantDir, recursive: true);
 				}
 			}
 
+			Directory.CreateDirectory(zhHansDir);
+			Directory.CreateDirectory(zhHantDir);
+
+			// Load old mod version list
+			Dictionary<string, Version> oldModVersionDict = new();	
+			if (File.Exists(modJsonPath))
+			{
+				try
+				{
+					var oldModVersionJson = File.ReadAllText(Path.Combine(zhHantDir, "mods.json"));
+					oldModVersionDict = JObject.Parse(oldModVersionJson).ToObject<Dictionary<string, Version>>();
+				}
+				catch
+				{
+					Logger.Error("Failed to load old mod version list, recreating localization files");
+				}
+			}
+
+			// Generate current mod version list
+			Dictionary<string, Version> modVersionDict = new();	
+			foreach (Mod mod in ModLoader.Mods)
+			{
+				if (LangExtractor.BlackListMods.Where(x => x == mod.Name).Any())
+				{
+					continue;
+				}
+
+				// TODO: should put all temp localization files into a single temp directory
+				if (IsModContainCJK(mod.Name)) {
+					modVersionDict.Add(mod.Name, mod.Version);
+				}
+			}
+
+			foreach (var (name, version) in modVersionDict)
+			{
+				if (!oldModVersionDict.ContainsKey(name) || oldModVersionDict[name] != version)
+				{
+					if (oldModVersionDict.ContainsKey(name))
+					{
+						Logger.Info($"Mod {name} version changed from {oldModVersionDict[name]} to {version}, recreating localization files");
+					}
+					else
+					{
+						Logger.Info($"Mod {name} is new, creating localization files");
+					}
+
+					// Remove old localization files
+					Utility.DeleteSubdirectories(Path.Combine(zhHantDir, name));
+
+					var cnLocalDir = LangExtractor.ExtractLocalization(name, "zh-Hans");
+
+					foreach (var fileInfo in Utility.GetFullDirList(new DirectoryInfo(cnLocalDir), "*.hjson", 5))
+					{
+						int startIdx = Path.GetFullPath(ExtraLanguage.LocalizationDir).Split(Path.DirectorySeparatorChar).Length;
+						var cnHjson = File.ReadAllText(fileInfo.FullName);
+
+						var translatedText = await TranslateStrings(cnHjson, "zh-Hans", "zh-Hant");
+						var splitPath = fileInfo.FullName.Split(Path.DirectorySeparatorChar);
+
+						for (int i = startIdx; i < splitPath.Length; i++)
+						{
+							splitPath[i] = splitPath[i].Replace("zh-Hans", "zh-Hant");
+						}
+
+						var dstFilePath = Path.Combine(splitPath);
+						Utility.CreateTextFile(dstFilePath, translatedText);
+					}
+					oldModVersionDict[name] = version;
+				}
+			}
+			
+			Utility.CreateTextFile(Path.Combine(zhHantDir, "mods.json"), JObject.FromObject(oldModVersionDict).ToString());
+
             ExtraLanguage.ModdedKeys["zh-Hant"] = LoadTranslation(zhHantDir);
 			Utility.UpdateModdedLocalizedTexts();
+
+			Directory.Delete(zhHansDir, recursive: true);
 		}
 
         internal List<(string,string)> LoadTranslation(string localizeDir)
