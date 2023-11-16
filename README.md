@@ -7,7 +7,7 @@ ExtraLanguage is a tModLoader module designed to add additional languages withou
 > This mod is still in development. Any content present is subject to change.
 
 ## Support Languages
-- Traditional Chinese
+- 正體中文 (Traditional Chinese)
 
 ## Available Plugins
 - Fanhuaji(繁化姬) Plugin
@@ -22,7 +22,7 @@ ExtraLanguage is a tModLoader module designed to add additional languages withou
     - For example, Fanhuaji plugin can automatically translate to Traditional Chinese from Simplified Chinese translation.
 
 ## How to use?
-1. Subscribe from Steam Workshop or download the mod from GitHub Repo.
+1. Subscribe from [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3085000141) or download the mod from GitHub Repo.
 2. Enable and reload the mod. All existing translation mods are compatible.
 
 
