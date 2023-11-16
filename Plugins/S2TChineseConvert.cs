@@ -9,7 +9,6 @@ using Hjson;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using System.Linq;
-using Terraria;
 
 namespace ExtraLanguage.Plugins
 {
