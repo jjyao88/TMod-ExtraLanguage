@@ -23,3 +23,7 @@ WARNING: This mod is still in development. Any content present is subject to cha
 ## How to use?
 1. Subscribe from Steam Workshop or download the mod from GitHub Repo.
 2. Enable and reload the mod. All existing translation mods are compatible.
+
+
+## Credits
+- [Cyrillya](https://github.com/Cyrillya) for his/her solution on fixing language resource packs on tModLoader
