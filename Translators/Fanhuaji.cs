@@ -10,17 +10,17 @@ namespace ExtraLanguage.Translators
     {
         public struct APIResponse
         {
-			public struct Data
+            public struct Data
             {
-				public string converter;
-				public string text;
+                public string converter;
+                public string text;
             }
 
             public Data data;
-			public int code;
-			public string msg;
-			public float execTime;
-		}
+            public int code;
+            public string msg;
+            public float execTime;
+        }
 
         public async Task<string> TranslateAsync(string text, string srcLang, string dstLang)
         {
@@ -32,14 +32,15 @@ namespace ExtraLanguage.Translators
                 { new StringContent("Taiwan"), "converter" },
             };
 
-            if (cfg != null && cfg.FanhuajiUserPostItems.Count > 0) {
+            if (cfg != null && cfg.FanhuajiUserPostItems.Count > 0)
+            {
                 content.Add(new StringContent(String.Join('\n', cfg.FanhuajiUserPostItems)), "userPostReplace");
             }
 
             using var resp = await ITranslator.httpClient.PostAsync(
                 "https://api.zhconvert.org/convert",
-				content
-			);
+                content
+            );
 
             if (!resp.IsSuccessStatusCode)
             {

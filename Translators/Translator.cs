@@ -6,7 +6,7 @@ namespace ExtraLanguage.Translators
 {
     public interface ITranslator
     {
-		protected readonly static HttpClient httpClient = new(handler: new HttpClientHandler()
+        protected readonly static HttpClient httpClient = new(handler: new HttpClientHandler()
         {
             UseCookies = false,
         });

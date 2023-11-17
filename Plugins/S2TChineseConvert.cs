@@ -12,27 +12,28 @@ using System.Linq;
 
 namespace ExtraLanguage.Plugins
 {
-    public class S2TChineseConvert : BasePlugin
-    {
-        public new string[] SupportedLanguages => new string[] { "zh-Hant" };
-        private readonly ITranslator Translator;
-        private static readonly Regex cjkCharRegex = new(@"\p{IsCJKUnifiedIdeographs}");
-        private bool ForceRecreateLocalization;
+	public class S2TChineseConvert : BasePlugin
+	{
+		public new string[] SupportedLanguages => new string[] { "zh-Hant" };
+		private readonly ITranslator Translator;
+		private static readonly Regex cjkCharRegex = new(@"\p{IsCJKUnifiedIdeographs}");
+		private bool ForceRecreateLocalization;
 
 		internal readonly string zhHansDir;
 		internal readonly string zhHantDir;
 
 		public override bool WaitForLoad => true;
 
-        public S2TChineseConvert(bool forceRecreateLocalization = false) {
-            if (GameCulture.FromName("zh-Hant").Name != "zh-Hant")
-                throw new Exception($"{nameof(S2TChineseConvert)} is only worked on zh-Hant");
+		public S2TChineseConvert(bool forceRecreateLocalization = false)
+		{
+			if (GameCulture.FromName("zh-Hant").Name != "zh-Hant")
+				throw new Exception($"{nameof(S2TChineseConvert)} is only worked on zh-Hant");
 
-            Translator = new FanhuajiTranslator();
-            zhHansDir = Path.Combine(ExtraLanguage.LocalizationDir, "zh-Hans");
+			Translator = new FanhuajiTranslator();
+			zhHansDir = Path.Combine(ExtraLanguage.LocalizationDir, "zh-Hans");
 			zhHantDir = Path.Combine(ExtraLanguage.LocalizationDir, "zh-Hant");
-            ForceRecreateLocalization = forceRecreateLocalization;
-        }
+			ForceRecreateLocalization = forceRecreateLocalization;
+		}
 
 		protected override bool CheckCondition()
 		{
@@ -43,14 +44,16 @@ namespace ExtraLanguage.Plugins
 		}
 
 		public static bool IsContainCJK(string text)
-        {
+		{
 			return cjkCharRegex.IsMatch(text);
 		}
 
-		public static bool IsModContainCJK(string modName) {
+		public static bool IsModContainCJK(string modName)
+		{
 
-            ModLoader.TryGetMod(modName, out Mod result);
-            if (result == null) {
+			ModLoader.TryGetMod(modName, out Mod result);
+			if (result == null)
+			{
 				return false;
 			}
 
@@ -68,7 +71,8 @@ namespace ExtraLanguage.Plugins
 			return false;
 		}
 
-		private static Dictionary<string, Version> GenerateModVeriosnList() {
+		private static Dictionary<string, Version> GenerateModVeriosnList()
+		{
 			var dict = new Dictionary<string, Version>();
 			foreach (Mod mod in ModLoader.Mods)
 			{
@@ -77,13 +81,15 @@ namespace ExtraLanguage.Plugins
 			return dict;
 		}
 
-        internal override async Task Load()
-        {
+		internal override async Task Load()
+		{
 			string modJsonPath = Path.Combine(zhHantDir, "mods.json");
 			bool createFlag = ForceRecreateLocalization || !File.Exists(modJsonPath);
 
-			if (createFlag) {
-				if (Directory.Exists(zhHantDir)) {
+			if (createFlag)
+			{
+				if (Directory.Exists(zhHantDir))
+				{
 					Directory.Delete(zhHantDir, recursive: true);
 				}
 			}
@@ -92,7 +98,7 @@ namespace ExtraLanguage.Plugins
 			Directory.CreateDirectory(zhHantDir);
 
 			// Load old mod version list
-			Dictionary<string, Version> oldModVersionDict = new();	
+			Dictionary<string, Version> oldModVersionDict = new();
 			if (File.Exists(modJsonPath))
 			{
 				try
@@ -107,7 +113,7 @@ namespace ExtraLanguage.Plugins
 			}
 
 			// Generate current mod version list
-			Dictionary<string, Version> modVersionDict = new();	
+			Dictionary<string, Version> modVersionDict = new();
 			foreach (Mod mod in ModLoader.Mods)
 			{
 				if (LangExtractor.BlackListMods.Where(x => x == mod.Name).Any())
@@ -116,7 +122,8 @@ namespace ExtraLanguage.Plugins
 				}
 
 				// TODO: should put all temp localization files into a single temp directory
-				if (IsModContainCJK(mod.Name)) {
+				if (IsModContainCJK(mod.Name))
+				{
 					modVersionDict.Add(mod.Name, mod.Version);
 				}
 			}
@@ -158,16 +165,16 @@ namespace ExtraLanguage.Plugins
 					oldModVersionDict[name] = version;
 				}
 			}
-			
+
 			Utility.CreateTextFile(Path.Combine(zhHantDir, "mods.json"), JObject.FromObject(oldModVersionDict).ToString());
 
-            ExtraLanguage.ModdedKeys["zh-Hant"] = LoadTranslation(zhHantDir);
+			ExtraLanguage.ModdedKeys["zh-Hant"] = LoadTranslation(zhHantDir);
 			Utility.UpdateModdedLocalizedTexts();
 
 			Directory.Delete(zhHansDir, recursive: true);
 		}
 
-        internal List<(string,string)> LoadTranslation(string localizeDir)
+		internal List<(string, string)> LoadTranslation(string localizeDir)
 		{
 			var totalKeysAndValues = new List<(string, string)>();
 
@@ -236,9 +243,10 @@ namespace ExtraLanguage.Plugins
 			return list;
 		}
 
-        private async Task<string> TranslateStrings(string srcTxt, string srcLang, string dstLang) {
-            var result = await Translator.TranslateAsync(srcTxt, srcLang, dstLang);
-            return result;
+		private async Task<string> TranslateStrings(string srcTxt, string srcLang, string dstLang)
+		{
+			var result = await Translator.TranslateAsync(srcTxt, srcLang, dstLang);
+			return result;
 		}
-    }
+	}
 }

@@ -13,7 +13,7 @@ namespace ExtraLanguage
 {
 	internal class LangExtractor
 	{
-        private readonly GameCulture TargetCulture;
+		private readonly GameCulture TargetCulture;
 
 		// Arguments: (Mod mod, string outputPath = null, GameCulture specificCulture = null)
 		private static readonly MethodInfo LocalizationLoader_UpdateLocalizationFilesForMod = typeof(LocalizationLoader).GetMethod("UpdateLocalizationFilesForMod", BindingFlags.Static | BindingFlags.NonPublic);
@@ -26,10 +26,12 @@ namespace ExtraLanguage
 			"ModLoader",
 		};
 
-		internal static string ExtractLocalization(string modName, string cultureName, string outDir) {
+		internal static string ExtractLocalization(string modName, string cultureName, string outDir)
+		{
 			var targetCulture = GameCulture.FromName(cultureName);
 
-			if (targetCulture.Name != cultureName) {
+			if (targetCulture.Name != cultureName)
+			{
 				throw new KeyNotFoundException($"Culture '{cultureName}' is not found in game!");
 			}
 
@@ -42,8 +44,8 @@ namespace ExtraLanguage
 			TmodFile tmodFile = (TmodFile)Mod_File.GetValue(mod);
 			List<TmodFile.FileEntry> localeFiles = tmodFile.Where(x => matchLocaleRegex.IsMatch(x.Name)).ToList();
 
-            foreach (var entry in localeFiles)
-            {
+			foreach (var entry in localeFiles)
+			{
 				var stream = tmodFile.GetStream(entry.Name);
 				if (stream == null)
 				{
@@ -57,10 +59,12 @@ namespace ExtraLanguage
 			return outDir;
 		}
 
-		internal static string ExtractLocalization(string modName, string cultureName) {
+		internal static string ExtractLocalization(string modName, string cultureName)
+		{
 			var targetCulture = GameCulture.FromName(cultureName);
 
-			if (targetCulture.Name != cultureName) {
+			if (targetCulture.Name != cultureName)
+			{
 				throw new KeyNotFoundException($"Culture '{cultureName}' is not found in game!");
 			}
 
@@ -91,10 +95,12 @@ namespace ExtraLanguage
 			return outLangDir;
 		}
 
-		internal static string ExtractLocalization(string cultureName) {
+		internal static string ExtractLocalization(string cultureName)
+		{
 			var targetCulture = GameCulture.FromName(cultureName);
 
-			if (targetCulture.Name != cultureName) {
+			if (targetCulture.Name != cultureName)
+			{
 				throw new KeyNotFoundException($"Culture '{cultureName}' is not found in game!");
 			}
 

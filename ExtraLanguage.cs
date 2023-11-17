@@ -26,8 +26,8 @@ namespace ExtraLanguage
 
 		public override void Load()
 		{
-            foreach (Mod mod in ModLoader.Mods)
-            {
+			foreach (Mod mod in ModLoader.Mods)
+			{
 				if (IncompatibleModNames.Contains(mod.Name))
 				{
 					throw new Exception($"Incompatible mod detected: {mod.Name}. Please unload it first before enabling this mod!");

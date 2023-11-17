@@ -13,16 +13,18 @@ namespace ExtraLanguage
 {
 	public partial class ExtraLanguage : Mod
 	{
-		private void LoadHooks() {
-            IL_Main.DrawMenu += HookLanguageSelection;
+		private void LoadHooks()
+		{
+			IL_Main.DrawMenu += HookLanguageSelection;
 			LanguageManager.Instance.OnLanguageChanged += HookOnLanguageChanged;
 			On_LanguageManager.LoadActiveCultureTranslationsFromSources += HookLoadActiveCultureTranslationsFromSources;
 			On_LanguageManager.LoadFilesForCulture += HookLoadFilesForCulture;
 		}
 
-        private void UnloadHooks() {
-            LanguageManager.Instance.OnLanguageChanged -= HookOnLanguageChanged;
-        }
+		private void UnloadHooks()
+		{
+			LanguageManager.Instance.OnLanguageChanged -= HookOnLanguageChanged;
+		}
 
 		private void HookLoadFilesForCulture(On_LanguageManager.orig_LoadFilesForCulture orig, LanguageManager self, GameCulture culture)
 		{
@@ -32,9 +34,9 @@ namespace ExtraLanguage
 		}
 
 		private void HookLoadActiveCultureTranslationsFromSources(On_LanguageManager.orig_LoadActiveCultureTranslationsFromSources orig, LanguageManager self)
-        {
-            // Workaround for loading language pack properly
-            // Detail: https://github.com/tModLoader/tModLoader/pull/2617
+		{
+			// Workaround for loading language pack properly
+			// Detail: https://github.com/tModLoader/tModLoader/pull/2617
 			var contentSources = self.GetType().GetField("_contentSources", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(self) as IContentSource[];
 			string assetNameStart = string.Concat(str2: self.ActiveCulture.Name, str0: "Localization", str1: Path.DirectorySeparatorChar.ToString()).ToLower();
 
@@ -50,7 +52,7 @@ namespace ExtraLanguage
 					{
 						continue;
 					}
-					
+
 					using Stream stream = item.OpenStream(item2);
 					using StreamReader streamReader = new StreamReader(stream);
 					string fileText = streamReader.ReadToEnd();
@@ -65,7 +67,7 @@ namespace ExtraLanguage
 					}
 				}
 			}
-        }
+		}
 
 		private void HookOnLanguageChanged(LanguageManager langMgr)
 		{
@@ -74,7 +76,7 @@ namespace ExtraLanguage
 			LocalizationConfig.UpdateLanguageName(langMgr.ActiveCulture.CultureInfo.Name);
 		}
 
-        private static void HookLanguageSelection(ILContext il)
+		private static void HookLanguageSelection(ILContext il)
 		{
 			try
 			{

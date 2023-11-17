@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
-using System.Text.Json.Serialization;
-using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
@@ -17,8 +15,10 @@ namespace ExtraLanguage
 		public override ConfigScope Mode => ConfigScope.ClientSide;
 
 		[Header("$Mods.ExtraLanguage.Configs.LocalizationConfig.DeveloperOnlyHeader")]
-		public string LanguageName { 
-			get{
+		public string LanguageName
+		{
+			get
+			{
 				try
 				{
 					using var file = File.OpenText(Path.Combine(ExtraLanguage.MainDir, "lang.txt"));
@@ -67,7 +67,7 @@ namespace ExtraLanguage
 			using var file = File.CreateText(Path.Combine(ExtraLanguage.MainDir, "lang.txt"));
 			file.WriteLine(lang);
 		}
-		
+
 
 		internal static void SaveConfig()
 		{
